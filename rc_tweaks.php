@@ -2,7 +2,7 @@
 /**
  * Plugin Name: RC Tweaks
  * Description: A plugin to generate an XML/RSS feed for the last 10 published 'envira' posts, display a gallery table page, and provide a tag widget for Envira galleries.
- * Version: 1.16.0
+ * Version: 1.17.0
  * Author: Morgan Blackthorne
  */
 
@@ -210,7 +210,7 @@ class RC_Envira_Tags_Widget extends WP_Widget {
         echo '<ul class="rc-envira-categories">';
         foreach ( $categories as $cat ) {
             $count = (int) $cat->count;
-            echo '<li><a href="' . esc_url( get_term_link( $cat ) ) . '">' . esc_html( $cat->name ) . '</a> (' . $count . ')</li>';
+            echo '<li>&bull; <a href="' . esc_url( get_term_link( $cat ) ) . '">' . esc_html( $cat->name ) . '</a> (' . $count . ')</li>';
         }
         echo '</ul>';
         echo $args['after_widget'];
@@ -268,7 +268,7 @@ class RC_Envira_Album_Categories_Widget extends WP_Widget {
         echo '<ul class="rc-envira-album-categories">';
         foreach ( $categories as $cat ) {
             $count = (int) $cat->count;
-            echo '<li><a href="' . esc_url( get_term_link( $cat ) ) . '">' . esc_html( $cat->name ) . '</a> (' . $count . ')</li>';
+            echo '<li>&bull; <a href="' . esc_url( get_term_link( $cat ) ) . '">' . esc_html( $cat->name ) . '</a> (' . $count . ')</li>';
         }
         echo '</ul>';
         echo $args['after_widget'];
