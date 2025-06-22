@@ -4,14 +4,17 @@
 The `rc_tweaks` plugin provides three main features for WordPress sites using the custom post type `envira`:
 
 1. **Envira RSS Feed:** Generates an XML/RSS feed for the last 10 published `envira` posts, sorted by publication date (descending).
-2. **Envira Gallery Table Page:** Automatically creates a page that displays a table of the 3 most recent published `envira` galleries, each showing up to 3 images from the gallery, rendered within your theme's header and footer.
-3. **Envira Tags Widget:** Adds a widget that displays a list of tags in the right navigation bar, but only on single Envira gallery pages.
+2. **Envira Gallery Table Page:** Automatically creates a page that displays a table of 3 random published `envira` galleries (excluding those in the "Dustrat" category), each showing up to 3 images from the gallery, sorted by oldest publication date first, rendered within your theme's header and footer.
+3. **Envira Gallery Categories Widget:** Adds a widget that displays a bulleted list of Envira categories (with gallery counts) in the sidebar, only on single Envira gallery pages.
+4. **Envira Album Categories Widget:** Adds a widget that displays a bulleted list of all Envira categories (with gallery counts) in the sidebar, only on Envira album post type pages and album taxonomy pages (e.g. `/album/members-gallery`).
 
 ## Features
 - Fetches the latest 10 published posts of type `envira` and outputs them as an RSS feed.
-- Adds a new page (`/envira-gallery-table/`) with a table of the 3 latest Envira galleries and images.
+- Adds a new page (`/envira-gallery-table/`) with a table of 3 random Envira galleries and images, sorted by oldest publication date first.
+- Excludes galleries in the "Dustrat" category from the gallery table.
 - Includes a shortcode `[rc_envira_gallery_table]` to display the gallery table anywhere.
-- Provides a widget to display tags for Envira galleries in the sidebar, visible only on single Envira gallery pages.
+- Provides a widget to display Envira categories for galleries in the sidebar, visible only on single Envira gallery pages.
+- Provides a widget to display all Envira categories (with counts) on Envira album post type and album taxonomy pages.
 - Easy integration with WordPress.
 
 ## Installation
@@ -46,6 +49,7 @@ http://yourdomain.com/?feed=envira-feed
 For support, please open an issue on the plugin's repository or contact the developer directly.
 
 ## Changelog
+- **1.18.0** - Moved code into subfiles as rc_tweaks.php was getting bloated.
 - **1.17.0** - Both Envira Gallery Categories and Envira Album Categories widgets now prefix each category name with a bullet character and a space.
 - **1.16.0** - Envira Album Categories widget now hides empty categories and removes debug output.
 - **1.15.0** - Improved Envira Album Categories widget: it now appears on album taxonomy pages (e.g. `/album/members-gallery`) as well as Envira album post type pages.

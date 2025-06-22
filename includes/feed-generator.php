@@ -1,5 +1,5 @@
 <?php
-// filepath: /home/morgan/git_local/rc_tweaks/rc_tweaks/includes/feed-generator.php
+// filepath: /home/morgan/git_local/rc_tweaks/includes/feed-generator.php
 
 function rc_tweaks_generate_feed() {
     header('Content-Type: application/rss+xml; charset=' . get_option('blog_charset'), true);
@@ -84,4 +84,10 @@ function rc_tweaks_generate_feed() {
 
     wp_reset_postdata();
 }
-?>
+
+// Register the feed
+add_action( 'init', 'rc_tweaks_register_feed' );
+
+function rc_tweaks_register_feed() {
+    add_feed( 'envira-feed', 'rc_tweaks_generate_feed' );
+}
