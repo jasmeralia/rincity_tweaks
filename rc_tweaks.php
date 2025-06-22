@@ -2,7 +2,7 @@
 /**
  * Plugin Name: RC Tweaks
  * Description: A plugin to generate an XML/RSS feed for the last 10 published 'envira' posts, display a gallery table page, and provide a tag widget for Envira galleries.
- * Version: 1.13.0
+ * Version: 1.14.0
  * Author: Morgan Blackthorne
  */
 
@@ -64,7 +64,7 @@ function rc_tweaks_gallery_table_shortcode() {
         ) : array(),
     ) );
 
-    // Collect posts and sort by publication date descending (newest first)
+    // Collect posts and sort by publication date ascending (oldest first)
     $galleries = array();
     if ( $envira_query->have_posts() ) {
         while ( $envira_query->have_posts() ) {
@@ -78,9 +78,9 @@ function rc_tweaks_gallery_table_shortcode() {
                 'gallery_data' => get_post_meta( get_the_ID(), '_eg_gallery_data', true ),
             );
         }
-        // Sort by publication date descending
+        // Sort by publication date ascending (oldest first)
         usort($galleries, function($a, $b) {
-            return $b['date_raw'] <=> $a['date_raw'];
+            return $a['date_raw'] <=> $b['date_raw'];
         });
 
         echo '<table style="width:100%; border-collapse:collapse;"><thead><tr>';
@@ -150,6 +150,7 @@ function rc_tweaks_gallery_table_shortcode() {
 // Register Envira Tags Widget
 add_action( 'widgets_init', function() {
     register_widget( 'RC_Envira_Tags_Widget' );
+    register_widget( 'RC_Envira_Album_Categories_Widget' );
 });
 
 class RC_Envira_Tags_Widget extends WP_Widget {
@@ -220,4 +221,46 @@ class RC_Envira_Tags_Widget extends WP_Widget {
         echo '<p>' . esc_html__( 'Displays Envira categories for Envira galleries. Only appears on Envira gallery posts.', 'rc_tweaks' ) . '</p>';
     }
 }
-?>
+
+// New widget: Display all categories with counts on Envira album pages only
+class RC_Envira_Album_Categories_Widget extends WP_Widget {
+    public function __construct() {
+        parent::__construct(
+            'rc_envira_album_categories_widget',
+            __('Envira Album Categories', 'rc_tweaks'),
+            array( 'description' => __( 'Displays all Envira categories with their counts on Envira album pages.', 'rc_tweaks' ) )
+        );
+    }
+
+    public function widget( $args, $instance ) {
+        global $post;
+
+        // Only display on Envira album pages
+        if ( ! ( isset($post) && $post instanceof WP_Post && $post->post_type === 'envira-album' ) ) {
+            return;
+        }
+
+        $categories = get_terms( array(
+            'taxonomy' => 'envira-category',
+            'hide_empty' => false,
+        ) );
+
+        if ( is_wp_error( $categories ) || empty( $categories ) ) {
+            return;
+        }
+
+        echo $args['before_widget'];
+        echo $args['before_title'] . esc_html__( 'All Gallery Categories', 'rc_tweaks' ) . $args['after_title'];
+        echo '<ul class="rc-envira-album-categories">';
+        foreach ( $categories as $cat ) {
+            $count = (int) $cat->count;
+            echo '<li><a href="' . esc_url( get_term_link( $cat ) ) . '">' . esc_html( $cat->name ) . '</a> (' . $count . ')</li>';
+        }
+        echo '</ul>';
+        echo $args['after_widget'];
+    }
+
+    public function form( $instance ) {
+        echo '<p>' . esc_html__( 'Displays all Envira categories with their gallery counts. Only appears on Envira album pages.', 'rc_tweaks' ) . '</p>';
+    }
+}

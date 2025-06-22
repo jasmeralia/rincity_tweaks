@@ -46,6 +46,7 @@ http://yourdomain.com/?feed=envira-feed
 For support, please open an issue on the plugin's repository or contact the developer directly.
 
 ## Changelog
+- **1.14.0** - Gallery table now sorts randomized results by oldest publication date first. Added a new widget that displays all Envira categories with their counts, visible only on Envira album pages.
 - **1.13.0** - Gallery table now displays 3 random Envira galleries, but always sorts the random selection by publication date (newest first) before display.
 - **1.12.0** - RSS feed excludes galleries not in the "Members Gallery" album and those scheduled for the future. Envira Gallery Categories widget now shows a total count of galleries in each category.
 - **1.11.0** - Envira Gallery Categories widget now hides itself if no categories are found for the gallery, and displays categories as a bulleted list when present.
