@@ -46,6 +46,7 @@ http://yourdomain.com/?feed=envira-feed
 For support, please open an issue on the plugin's repository or contact the developer directly.
 
 ## Changelog
+- **1.16.0** - Envira Album Categories widget now hides empty categories and removes debug output.
 - **1.15.0** - Improved Envira Album Categories widget: it now appears on album taxonomy pages (e.g. `/album/members-gallery`) as well as Envira album post type pages.
 - **1.14.0** - Gallery table now sorts randomized results by oldest publication date first. Added a new widget that displays all Envira categories with their counts, visible only on Envira album pages.
 - **1.13.0** - Gallery table now displays 3 random Envira galleries, but always sorts the random selection by publication date (newest first) before display.
