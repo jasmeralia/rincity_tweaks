@@ -2,7 +2,7 @@
 /**
  * Plugin Name: RC Tweaks
  * Description: A plugin to generate an XML/RSS feed for the last 10 published 'envira' posts, display a gallery table page, and provide a tag widget for Envira galleries.
- * Version: 1.14.0
+ * Version: 1.15.0
  * Author: Morgan Blackthorne
  */
 
@@ -235,8 +235,26 @@ class RC_Envira_Album_Categories_Widget extends WP_Widget {
     public function widget( $args, $instance ) {
         global $post;
 
-        // Only display on Envira album pages
-        if ( ! ( isset($post) && $post instanceof WP_Post && $post->post_type === 'envira-album' ) ) {
+        // Display only on Envira album post type or Envira album taxonomy archive (pretty permalinks like /album/slug)
+        $is_album_page = false;
+
+        // Check if current post is an Envira album
+        if ( isset($post) && $post instanceof WP_Post && $post->post_type === 'envira-album' ) {
+            $is_album_page = true;
+        }
+
+        // Check if this is an Envira album taxonomy archive (pretty permalinks like /album/slug)
+        if ( is_tax('envira-album') || (function_exists('is_envira_album') && is_envira_album()) ) {
+            $is_album_page = true;
+        }
+
+        // Also check for queried object being an envira-album term (for /album/slug)
+        $queried = get_queried_object();
+        if ( isset($queried->taxonomy) && $queried->taxonomy === 'envira-album' ) {
+            $is_album_page = true;
+        }
+
+        if ( ! $is_album_page ) {
             return;
         }
 
