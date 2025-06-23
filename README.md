@@ -49,6 +49,10 @@ http://yourdomain.com/?feed=envira-feed
 For support, please open an issue on the plugin's repository or contact the developer directly.
 
 ## Changelog
+- **1.18.5** - Further fixes for rss feed.
+- **1.18.3** - RSS feed now only includes galleries that are members of the "Members Gallery" album.
+- **1.18.2** - Update the XML namespace config.
+- **1.18.1** - RSS feed description now prepends the first image as an `<img src="...">` tag.
 - **1.18.0** - Moved code into subfiles as rc_tweaks.php was getting bloated.
 - **1.17.0** - Both Envira Gallery Categories and Envira Album Categories widgets now prefix each category name with a bullet character and a space.
 - **1.16.0** - Envira Album Categories widget now hides empty categories and removes debug output.
