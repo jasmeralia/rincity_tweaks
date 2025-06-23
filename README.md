@@ -49,6 +49,7 @@ http://yourdomain.com/?feed=envira-feed
 For support, please open an issue on the plugin's repository or contact the developer directly.
 
 ## Changelog
+- **1.19.0** - Fixed rss feed showing scheduled galleries.
 - **1.18.5** - Further fixes for rss feed.
 - **1.18.3** - RSS feed now only includes galleries that are members of the "Members Gallery" album.
 - **1.18.2** - Update the XML namespace config.

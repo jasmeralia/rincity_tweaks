@@ -53,15 +53,53 @@ function rc_tweaks_generate_feed() {
     if ($query->have_posts()) {
         while ($query->have_posts()) {
             $query->the_post();
-            $item = $dom->createElement('item');
 
+            // Check Envira scheduling meta
+            $gallery_data = get_post_meta(get_the_ID(), '_eg_gallery_data', true);
+            $now = current_time('timestamp');
+
+            // Always add debug comment for this gallery
+            $start_raw = $gallery_data['config']['schedule_start'] ?? 0;
+            $end_raw = $gallery_data['config']['schedule_end'] ?? 0;
+
+            $start = (is_numeric($start_raw) && $start_raw > 0) ? intval($start_raw) : ($start_raw ? strtotime($start_raw) : 0);
+            $end = (is_numeric($end_raw) && $end_raw > 0) ? intval($end_raw) : ($end_raw ? strtotime($end_raw) : 0);
+
+            $debug_comment = sprintf(
+                ' Gallery ID: %d | Schedule: %s | Start: %s | End: %s | Now: %s',
+                get_the_ID(),
+                isset($gallery_data['config']['schedule']) ? $gallery_data['config']['schedule'] : 'not set',
+                $start ? date('c', $start) : 'none',
+                $end ? date('c', $end) : 'none',
+                date('c', $now)
+            );
+            // $channel->appendChild($dom->createComment($debug_comment));
+
+            // Scheduling logic (skip if not in window)
+            if (!empty($gallery_data['config']['schedule']) && $gallery_data['config']['schedule'] == 1) {
+                // $channel->appendChild($dom->createComment('Gallery scheduling is enabled for this gallery.'));
+                if ($start && $end) {
+                    if ($now < $start || $now > $end) {
+                        continue;
+                    }
+                } elseif ($start) {
+                    if ($now < $start) {
+                        continue;
+                    }
+                } elseif ($end) {
+                    if ($now > $end) {
+                        continue;
+                    }
+                }
+            }
+
+            $item = $dom->createElement('item');
             $item_title = $dom->createElement('title', get_the_title());
             $item_link = $dom->createElement('link', get_permalink());
             $item_description = $dom->createElement('description');
             $desc_text = get_the_excerpt();
 
             // Get first image from Envira gallery (stored in '_eg_gallery_data' post meta)
-            $gallery_data = get_post_meta(get_the_ID(), '_eg_gallery_data', true);
             $img_tag = '';
             if (!empty($gallery_data['gallery']) && is_array($gallery_data['gallery'])) {
                 $first_image = reset($gallery_data['gallery']);
