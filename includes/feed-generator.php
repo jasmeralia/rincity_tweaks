@@ -50,13 +50,16 @@ function rc_tweaks_generate_feed() {
     $channel->appendChild($link);
     $channel->appendChild($description);
 
+    // Get the current time in UTC and store the timestamp in $now_ts
+    $now_dt = new DateTime('now', new DateTimeZone('UTC'));
+    $now_ts = $now_dt->getTimestamp();
+
     if ($query->have_posts()) {
         while ($query->have_posts()) {
             $query->the_post();
 
             // Check Envira scheduling meta
             $gallery_data = get_post_meta(get_the_ID(), '_eg_gallery_data', true);
-            $now = current_time('timestamp');
 
             // Always add debug comment for this gallery
             $start_raw = $gallery_data['config']['schedule_start'] ?? 0;
@@ -71,7 +74,7 @@ function rc_tweaks_generate_feed() {
                 isset($gallery_data['config']['schedule']) ? $gallery_data['config']['schedule'] : 'not set',
                 $start ? date('c', $start) : 'none',
                 $end ? date('c', $end) : 'none',
-                date('c', $now)
+                $now_dt->format('c')
             );
             // $channel->appendChild($dom->createComment($debug_comment));
 
@@ -79,15 +82,15 @@ function rc_tweaks_generate_feed() {
             if (!empty($gallery_data['config']['schedule']) && $gallery_data['config']['schedule'] == 1) {
                 // $channel->appendChild($dom->createComment('Gallery scheduling is enabled for this gallery.'));
                 if ($start && $end) {
-                    if ($now < $start || $now > $end) {
+                    if ($now_ts < $start || $now_ts > $end) {
                         continue;
                     }
                 } elseif ($start) {
-                    if ($now < $start) {
+                    if ($now_ts < $start) {
                         continue;
                     }
                 } elseif ($end) {
-                    if ($now > $end) {
+                    if ($now_ts > $end) {
                         continue;
                     }
                 }
