@@ -49,6 +49,12 @@ http://yourdomain.com/?feed=envira-feed
 For support, please open an issue on the plugin's repository or contact the developer directly.
 
 ## Changelog
+- **1.20.5** - Envira category links in widgets now point to the Members Gallery album page with the correct query parameter for deep linking.
+- **1.20.4** - Version bump and changelog update.
+- **1.20.3** - Minor code cleanup and maintenance for Envira deeplink support.
+- **1.20.2** - Improved Envira deeplink support: added delay and selector fallback for more reliable category filter activation via URL.
+- **1.20.1** - Second pass at deeplinks.
+- **1.20.0** - Initial pass at deeplink support.
 - **1.19.3** - Fixed a critical error in the RSS feed by ensuring `$now_dt->format('c')` is used for debug output instead of the DateTime object; clarified and enforced UTC time comparisons for all scheduling logic.
 - **1.19.2** - Fixed critical error in RSS feed by ensuring all time comparisons use UTC and consistent variable names; improved handling of schedule values as both string and integer.
 - **1.19.1** - Fixed RSS feed to properly exclude scheduled galleries by comparing all times in UTC and handling both string and integer schedule values.

@@ -64,7 +64,8 @@ class RC_Envira_Tags_Widget extends WP_Widget {
         echo '<ul class="rc-envira-categories">';
         foreach ( $categories as $cat ) {
             $count = (int) $cat->count;
-            echo '<li>&bull; <a href="' . esc_url( get_term_link( $cat ) ) . '">' . esc_html( $cat->name ) . '</a> (' . $count . ')</li>';
+            $link = '/album/members-gallery/?envira-category=envira-category-' . $cat->term_id;
+            echo '<li>&bull; <a href="' . esc_url( $link ) . '">' . esc_html( $cat->name ) . '</a> (' . $count . ')</li>';
         }
         echo '</ul>';
         echo $args['after_widget'];
@@ -108,27 +109,78 @@ class RC_Envira_Album_Categories_Widget extends WP_Widget {
             return;
         }
 
+        // Get all envira galleries in the Members Gallery album (ID 1411)
+        $album_id = 1411;
+        $album_data = get_post_meta($album_id, '_eg_album_data', true);
+        $gallery_ids = [];
+        if (!empty($album_data['galleryIDs']) && is_array($album_data['galleryIDs'])) {
+            $gallery_ids = $album_data['galleryIDs'];
+        }
+
+        // Get all categories assigned to galleries in the album
         $categories = get_terms( array(
             'taxonomy' => 'envira-category',
-            'hide_empty' => true,
+            'hide_empty' => false,
         ) );
 
         if ( is_wp_error( $categories ) || empty( $categories ) ) {
             return;
         }
 
+        // Count galleries per category, but only for those in the album
+        $cat_counts = [];
+        foreach ( $categories as $cat ) {
+            $cat_counts[$cat->term_id] = 0;
+        }
+        $total_galleries = 0;
+        if ( !empty($gallery_ids) ) {
+            foreach ( $gallery_ids as $gid ) {
+                $gallery_cats = wp_get_object_terms( $gid, 'envira-category', array('fields' => 'ids') );
+                if ( is_array($gallery_cats) ) {
+                    foreach ( $gallery_cats as $cid ) {
+                        if ( isset($cat_counts[$cid]) ) {
+                            $cat_counts[$cid]++;
+                        }
+                    }
+                }
+                $total_galleries++;
+            }
+        }
+
         echo $args['before_widget'];
         echo $args['before_title'] . esc_html__( 'All Gallery Categories', 'rc_tweaks' ) . $args['after_title'];
         echo '<ul class="rc-envira-album-categories">';
+
+        // Add "All" link first
+        echo '<li>&bull; <a href="/album/members-gallery/" class="envira-album-filter-all" data-envira-filter="*">All</a> (' . intval($total_galleries) . ')</li>';
+
+        // Output each category with count, only if at least one gallery in album has it
         foreach ( $categories as $cat ) {
-            $count = (int) $cat->count;
-            echo '<li>&bull; <a href="' . esc_url( get_term_link( $cat ) ) . '">' . esc_html( $cat->name ) . '</a> (' . $count . ')</li>';
+            $count = isset($cat_counts[$cat->term_id]) ? $cat_counts[$cat->term_id] : 0;
+            if ( $count > 0 ) {
+                $filter = '.envira-category-' . $cat->term_id;
+                $link = '/album/members-gallery/?envira-category=envira-category-' . $cat->term_id;
+                echo '<li>&bull; <a href="' . esc_url( $link ) . '" class="envira-album-filter" data-envira-filter="' . esc_attr($filter) . '">' . esc_html( $cat->name ) . '</a> (' . $count . ')</li>';
+            }
         }
         echo '</ul>';
+
+        // Output hidden filter links for JS compatibility (simulate Envira's markup)
+        echo '<div style="display:none" id="rc-envira-filters">';
+        echo '<a href="/album/members-gallery/" data-envira-filter="*"></a>';
+        foreach ( $categories as $cat ) {
+            $count = isset($cat_counts[$cat->term_id]) ? $cat_counts[$cat->term_id] : 0;
+            if ( $count > 0 ) {
+                $filter = '.envira-category-' . $cat->term_id;
+                echo '<a href="/album/members-gallery/?envira-category=envira-category-' . $cat->term_id . '" data-envira-filter="' . esc_attr($filter) . '"></a>';
+            }
+        }
+        echo '</div>';
+
         echo $args['after_widget'];
     }
 
     public function form( $instance ) {
-        echo '<p>' . esc_html__( 'Displays all Envira categories with their gallery counts. Only appears on Envira album pages.', 'rc_tweaks' ) . '</p>';
+        echo '<p>' . esc_html__( 'Displays all Envira categories with their gallery counts (for galleries in the Members Gallery album). Only appears on Envira album pages.', 'rc_tweaks' ) . '</p>';
     }
 }
