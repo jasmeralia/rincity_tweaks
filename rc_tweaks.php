@@ -2,7 +2,7 @@
 /**
  * Plugin Name: RC Tweaks
  * Description: A plugin to generate an XML/RSS feed for the last 10 published 'envira' posts, display a gallery table page, and provide a tag widget for Envira galleries.
- * Version: 1.20.5
+ * Version: 1.24.1
  * Author: Morgan Blackthorne
  */
 
@@ -22,3 +22,6 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/gallery-table-generator.php
 
 // Include the widgets
 require_once plugin_dir_path( __FILE__ ) . 'includes/widgets.php';
+
+// Include the random gallery redirect
+require_once plugin_dir_path( __FILE__ ) . 'includes/random-gallery-redirect.php';
