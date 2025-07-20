@@ -1,8 +1,8 @@
 <?php
 /**
- * Plugin Name: RC Tweaks
- * Description: A plugin to generate an XML/RSS feed for the last 10 published 'envira' posts, display a gallery table page, and provide a tag widget for Envira galleries.
- * Version: 1.24.1
+ * Plugin Name: Rin City Tweaks
+ * Description: A plugin to provide several tweaks to customize Envira Gallery functionality for Rin City.
+ * Version: 2.0.40
  * Author: Morgan Blackthorne
  */
 
@@ -10,9 +10,6 @@
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
-
-// Include the deeplink functionality
-require_once plugin_dir_path( __FILE__ ) . 'includes/deeplink.php';
 
 // Include the feed generator
 require_once plugin_dir_path( __FILE__ ) . 'includes/feed-generator.php';
@@ -25,3 +22,6 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/widgets.php';
 
 // Include the random gallery redirect
 require_once plugin_dir_path( __FILE__ ) . 'includes/random-gallery-redirect.php';
+
+// Include the album page functionality
+require_once plugin_dir_path( __FILE__ ) . 'includes/album-page.php';

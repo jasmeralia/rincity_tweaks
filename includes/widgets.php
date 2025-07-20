@@ -64,7 +64,7 @@ class RC_Envira_Tags_Widget extends WP_Widget {
         echo '<ul class="rc-envira-categories">';
         foreach ( $categories as $cat ) {
             $count = (int) $cat->count;
-            $link = '/album/members-gallery/?envira-category=envira-category-' . $cat->term_id;
+            $link = '/members-gallery/?envira-category=envira-category-' . $cat->term_id;
             echo '<li>&bull; <a href="' . esc_url( $link ) . '">' . esc_html( $cat->name ) . '</a> (' . $count . ')</li>';
         }
         echo '</ul>';
@@ -103,6 +103,18 @@ class RC_Envira_Album_Categories_Widget extends WP_Widget {
         }
         if ( function_exists('is_envira_album') && is_envira_album() ) {
             $is_album_page = true;
+        }
+
+        // Also display on /members-gallery/ page
+        if ( ! $is_album_page ) {
+            $queried = get_queried_object();
+            if (
+                isset($queried->post_name) &&
+                $queried->post_name === 'members-gallery' &&
+                $queried->post_type === 'page'
+            ) {
+                $is_album_page = true;
+            }
         }
 
         if ( ! $is_album_page ) {
@@ -152,30 +164,18 @@ class RC_Envira_Album_Categories_Widget extends WP_Widget {
         echo '<ul class="rc-envira-album-categories">';
 
         // Add "All" link first
-        echo '<li>&bull; <a href="/album/members-gallery/" class="envira-album-filter-all" data-envira-filter="*">All</a> (' . intval($total_galleries) . ')</li>';
+        echo '<li>&bull; <a href="/members-gallery/" class="envira-album-filter-all" data-envira-filter="*">All Categories (' . intval($total_galleries) . ')</a></li>';
 
         // Output each category with count, only if at least one gallery in album has it
         foreach ( $categories as $cat ) {
             $count = isset($cat_counts[$cat->term_id]) ? $cat_counts[$cat->term_id] : 0;
             if ( $count > 0 ) {
                 $filter = '.envira-category-' . $cat->term_id;
-                $link = '/album/members-gallery/?envira-category=envira-category-' . $cat->term_id;
-                echo '<li>&bull; <a href="' . esc_url( $link ) . '" class="envira-album-filter" data-envira-filter="' . esc_attr($filter) . '">' . esc_html( $cat->name ) . '</a> (' . $count . ')</li>';
+                $link = '/members-gallery/?envira-category=envira-category-' . $cat->term_id;
+                echo '<li>&bull; <a href="' . esc_url( $link ) . '" class="envira-album-filter" data-envira-filter="' . esc_attr($filter) . '">' . esc_html( $cat->name ) . ' (' . $count . ')</a></li>';
             }
         }
         echo '</ul>';
-
-        // Output hidden filter links for JS compatibility (simulate Envira's markup)
-        echo '<div style="display:none" id="rc-envira-filters">';
-        echo '<a href="/album/members-gallery/" data-envira-filter="*"></a>';
-        foreach ( $categories as $cat ) {
-            $count = isset($cat_counts[$cat->term_id]) ? $cat_counts[$cat->term_id] : 0;
-            if ( $count > 0 ) {
-                $filter = '.envira-category-' . $cat->term_id;
-                echo '<a href="/album/members-gallery/?envira-category=envira-category-' . $cat->term_id . '" data-envira-filter="' . esc_attr($filter) . '"></a>';
-            }
-        }
-        echo '</div>';
 
         echo $args['after_widget'];
     }
