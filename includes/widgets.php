@@ -7,6 +7,22 @@ add_action( 'widgets_init', function() {
     register_widget( 'RC_Envira_Album_Categories_Widget' );
 });
 
+function rc_category_tree_assets() {
+    // NOTE: this second parameter must point at the root plugin file
+    $css_url = plugins_url(
+        'assets/css/category-tree.css',
+        dirname( __FILE__, 2 ) . '/rc_tweaks.php'
+    );
+    $js_url  = plugins_url(
+        'assets/js/category-tree.js',
+        dirname( __FILE__, 2 ) . '/rc_tweaks.php'
+    );
+    wp_enqueue_style(  'rc-category-tree-css', $css_url, [], '1.0' );
+    wp_enqueue_script( 'rc-category-tree-js',  $js_url,  ['jquery'], '1.0', true );
+}
+add_action( 'wp_enqueue_scripts', 'rc_category_tree_assets' );
+
+// New widget: Display Envira categories for Envira galleries (only on Envira gallery posts)
 class RC_Envira_Tags_Widget extends WP_Widget {
     public function __construct() {
         parent::__construct(
@@ -87,6 +103,41 @@ class RC_Envira_Album_Categories_Widget extends WP_Widget {
         );
     }
 
+    /**
+     * Recursive helper to render a term and its children.
+     */
+    public function rc_render_term_branch( $term, $cat_counts ) {
+        // Check for children
+        $children = get_terms([
+            'taxonomy'   => 'envira-category',
+            'hide_empty' => false,
+            'parent'     => $term->term_id,
+        ]);
+
+        // Toggle icon — only add it if there are children
+        $has_children = ! empty( $children );
+        $icon_html    = $has_children
+            ? '<span class="rc-toggle-icon closed">▶</span> '
+            : '<span class="rc-toggle-icon no-children"></span> ';
+
+        echo '<li class="rc-category-item">';
+        echo $icon_html;
+        $filter = '.envira-category-' . $term->term_id;
+        $link = '/members-gallery/?envira-category=envira-category-' . $term->term_id;
+        echo '&bull; <a href="' . esc_url( $link ) . '" class="envira-album-filter">' . esc_html( $term->name ) . ' (' . $cat_counts[$term->term_id] . ')</a>';
+
+        if ( $has_children ) {
+            // Hidden by default; CSS will hide .children
+            echo '<ul class="children">';
+            foreach ( $children as $child ) {
+                $this->rc_render_term_branch( $child, $cat_counts );
+            }
+            echo '</ul>';
+        }
+
+        echo '</li>';
+    }
+
     public function widget( $args, $instance ) {
         global $post;
 
@@ -129,11 +180,18 @@ class RC_Envira_Album_Categories_Widget extends WP_Widget {
             $gallery_ids = $album_data['galleryIDs'];
         }
 
-        // Get all categories assigned to galleries in the album
+        // Get all top level categories assigned to galleries in the album
         $categories = get_terms( array(
             'taxonomy' => 'envira-category',
             'hide_empty' => false,
         ) );
+
+        // 1. Get all top-level terms.
+        $terms = get_terms([
+            'taxonomy'   => 'envira-category',
+            'hide_empty' => false,
+            'parent'     => 0,
+        ]);
 
         if ( is_wp_error( $categories ) || empty( $categories ) ) {
             return;
@@ -161,22 +219,16 @@ class RC_Envira_Album_Categories_Widget extends WP_Widget {
 
         echo $args['before_widget'];
         echo $args['before_title'] . esc_html__( 'All Gallery Categories', 'rc_tweaks' ) . $args['after_title'];
-        echo '<ul class="rc-envira-album-categories">';
+        echo '<ul class="rc-category-tree">';
 
         // Add "All" link first
-        echo '<li>&bull; <a href="/members-gallery/" class="envira-album-filter-all" data-envira-filter="*">All Categories (' . intval($total_galleries) . ')</a></li>';
-
-        // Output each category with count, only if at least one gallery in album has it
-        foreach ( $categories as $cat ) {
-            $count = isset($cat_counts[$cat->term_id]) ? $cat_counts[$cat->term_id] : 0;
-            if ( $count > 0 ) {
-                $filter = '.envira-category-' . $cat->term_id;
-                $link = '/members-gallery/?envira-category=envira-category-' . $cat->term_id;
-                echo '<li>&bull; <a href="' . esc_url( $link ) . '" class="envira-album-filter" data-envira-filter="' . esc_attr($filter) . '">' . esc_html( $cat->name ) . ' (' . $count . ')</a></li>';
-            }
+        echo '<li class="rc-category-item"><span class="rc-toggle-icon no-children"></span> &bull; <a href="/members-gallery/" class="envira-album-filter-all" data-envira-filter="*">All Categories (' . intval($total_galleries) . ')</a></li>';
+        // Output each category with count
+        foreach ( $terms as $term ) {
+            $this->rc_render_term_branch( $term, $cat_counts );
         }
-        echo '</ul>';
 
+        echo '</ul>';
         echo $args['after_widget'];
     }
 
