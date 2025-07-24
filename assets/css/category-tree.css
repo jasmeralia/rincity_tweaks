@@ -1,0 +1,17 @@
+.rc-category-tree .children {
+  display: none;
+  margin-left: 1em;
+  list-style: none;
+}
+
+.rc-toggle-icon {
+  cursor: pointer;
+  display: inline-block;
+  width: 1em;
+}
+.rc-toggle-icon.no-children {
+  visibility: hidden;  /* hide icon for leaf nodes */
+}
+.rc-toggle-icon.open {
+  transform: rotate(90deg);  /* or swap to “▼” */
+}
